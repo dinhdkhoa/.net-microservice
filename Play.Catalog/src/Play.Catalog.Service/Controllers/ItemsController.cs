@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Play.Catalog.Service.Dtos;
+using Play.Catalog.Service.Mappers;
+using Play.Catalog.Service.Repositories;
 
 namespace Play.Catalog.Service.Controllers
 {
@@ -11,6 +13,7 @@ namespace Play.Catalog.Service.Controllers
     [Route("items")]
     public class ItemsController : ControllerBase
     {
+        private readonly ItemRepository repo = new ();
         private static readonly List<ItemDto> items = new(){
             new ItemDto( "Potion", "Restores a small amount of HP", 5),
             new ItemDto( "Antidote", "Cures poison", 7),
@@ -18,57 +21,66 @@ namespace Play.Catalog.Service.Controllers
         };
 
         [HttpGet]
-        public IEnumerable<ItemDto> Get()
+        public async Task<IActionResult> Get()
         {
-            return items;
+            var items = await repo.GetItemsAsync();
+            return Ok(items.Select(item => item.ToItemDto()));
         }
 
         [HttpGet("{id}")]
-        public ItemDto GetById(Guid id)
+        public async Task<IActionResult> GetById(Guid id)
         {
-            return items.FirstOrDefault(item => item.Id == id);
+            var item = await repo.GetByIdAsync(id);
+
+            if(item == null){
+                return NotFound();
+            }
+
+            return Ok(item.ToItemDto());
         }
 
         [HttpPost]
-        public IActionResult Add(CreateItemDto item)
+        public async Task<IActionResult> Add(CreateItemDto item)
         {
             if(!ModelState.IsValid)
             {
                 return UnprocessableEntity(ModelState);
             }
             var newItem = new ItemDto(item.Name, item.Description, item.Price);
-            items.Add(newItem);
+            await repo.CreateAsync(newItem.ToItemFromDto());
             return CreatedAtAction(nameof(GetById), new { id = newItem.Id }, newItem);
         }
         [HttpDelete("{id}")]
-        public IActionResult Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid id)
         {
-            var item = items.FirstOrDefault(item => item.Id == id);
-            if(item == null)
+            var item = await repo.GetByIdAsync(id);
+
+            if (item == null)
             {
                 return NotFound();
             }
-            items.Remove(item);
+            await repo.DeleteAsync(id);
             return NoContent();
         }
         [HttpPut("{id}")]
-        public IActionResult Update(Guid id, UpdateItemDto item)
+        public async Task<IActionResult> Update(Guid id, UpdateItemDto req)
         {
             if (!ModelState.IsValid)
             {
                 return UnprocessableEntity(ModelState);
             }
-            var found = items.FindIndex(i => i.Id == id);
-            if(found == -1)
+            var item = await repo.GetByIdAsync(id);
+
+            if (item == null)
             {
                 return NotFound();
             }
-            items[found] = items[found] with
-            {
-                Name = item.Name,
-                Description = item.Description,
-                Price = item.Price
-            };
+            
+            item.Description = req.Description;
+            item.Name = req.Name;
+            item.Price = req.Price;
+
+            await repo.UpdateAsync(item);
             return NoContent();
         }
     }
