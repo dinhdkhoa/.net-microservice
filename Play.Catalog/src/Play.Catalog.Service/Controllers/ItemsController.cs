@@ -13,12 +13,17 @@ namespace Play.Catalog.Service.Controllers
     [Route("items")]
     public class ItemsController : ControllerBase
     {
-        private readonly ItemRepository repo = new ();
+        private readonly IItemRepository repo;
         // private static readonly List<ItemDto> items = new(){
         //     new ItemDto( "Potion", "Restores a small amount of HP", 5),
         //     new ItemDto( "Antidote", "Cures poison", 7),
         //     new ItemDto( "Bronze sword", "Deals a small amount of damage", 20)
         // };
+
+        public ItemsController(IItemRepository _repo)
+        {
+            repo = _repo;
+        }
 
         [HttpGet]
         public async Task<IActionResult> Get()
