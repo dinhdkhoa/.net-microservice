@@ -14,11 +14,11 @@ namespace Play.Catalog.Service.Controllers
     public class ItemsController : ControllerBase
     {
         private readonly ItemRepository repo = new ();
-        private static readonly List<ItemDto> items = new(){
-            new ItemDto( "Potion", "Restores a small amount of HP", 5),
-            new ItemDto( "Antidote", "Cures poison", 7),
-            new ItemDto( "Bronze sword", "Deals a small amount of damage", 20)
-        };
+        // private static readonly List<ItemDto> items = new(){
+        //     new ItemDto( "Potion", "Restores a small amount of HP", 5),
+        //     new ItemDto( "Antidote", "Cures poison", 7),
+        //     new ItemDto( "Bronze sword", "Deals a small amount of damage", 20)
+        // };
 
         [HttpGet]
         public async Task<IActionResult> Get()

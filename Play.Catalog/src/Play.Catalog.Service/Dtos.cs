@@ -15,13 +15,22 @@ namespace Play.Catalog.Service.Dtos
         public DateTimeOffset CreatedDate { get; init; }
 
         // Custom constructor to set default value for CreatedDate
-        public ItemDto(string name, string description, decimal price)
+        public ItemDto(string name, string description, decimal price , Guid id, DateTimeOffset createdDate)
         {
-            Id = Guid.NewGuid();
+            Id = id;
             Name = name;
             Description = description;
             Price = price;
+            CreatedDate = createdDate;
+        }
+
+        public ItemDto(string name, string description, decimal price)
+        {
+            Name = name;
+            Id = Guid.NewGuid();
             CreatedDate = DateTimeOffset.UtcNow;
+            Description = description;
+            Price = price;
         }
     }
     public record CreateItemDto([Required]string Name, string Description, [Range(0,1000)]decimal Price);

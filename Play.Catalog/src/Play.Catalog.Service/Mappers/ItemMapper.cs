@@ -11,7 +11,7 @@ namespace Play.Catalog.Service.Mappers
     {
         public static ItemDto ToItemDto(this Item item)
         {
-            return new ItemDto(item.Name, item.Description, item.Price);
+            return new ItemDto(item.Name, item.Description, item.Price, item.Id, item.CreatedDate);
         }
         public static Item ToItemFromDto(this ItemDto item)
         {
