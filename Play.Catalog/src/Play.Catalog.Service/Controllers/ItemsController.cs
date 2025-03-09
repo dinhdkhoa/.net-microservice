@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Play.Catalog.Service.Dtos;
+using Play.Catalog.Service.Entities;
 using Play.Catalog.Service.Mappers;
 using Play.Catalog.Service.Repositories;
 
@@ -13,14 +14,14 @@ namespace Play.Catalog.Service.Controllers
     [Route("items")]
     public class ItemsController : ControllerBase
     {
-        private readonly IItemRepository repo;
+        private readonly IRepository<Item> repo;
         // private static readonly List<ItemDto> items = new(){
         //     new ItemDto( "Potion", "Restores a small amount of HP", 5),
         //     new ItemDto( "Antidote", "Cures poison", 7),
         //     new ItemDto( "Bronze sword", "Deals a small amount of damage", 20)
         // };
 
-        public ItemsController(IItemRepository _repo)
+        public ItemsController(IRepository<Item> _repo)
         {
             repo = _repo;
         }
@@ -28,7 +29,7 @@ namespace Play.Catalog.Service.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var items = await repo.GetItemsAsync();
+            var items = await repo.GetListAsync();
             return Ok(items.Select(item => item.ToItemDto()));
         }
 
