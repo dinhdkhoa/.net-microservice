@@ -1,16 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using Play.Common.MongoDB;
+using Play.Inventory.Service.Entities;
 
 namespace Play.Inventory.Service
 {
@@ -27,6 +22,7 @@ namespace Play.Inventory.Service
         public void ConfigureServices(IServiceCollection services)
         {
 
+            services.AddMongo().AddMongoRepository<InventoryItem>("inventoryitems");
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {

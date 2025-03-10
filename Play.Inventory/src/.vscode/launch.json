@@ -10,12 +10,12 @@
       "args": [],
       "cwd": "${workspaceFolder}/Play.Inventory.Service",
       "stopAtEntry": false,
-      // "serverReadyAction": {
-      //   "action": "openExternally",
-      //   "pattern": "\\bNow listening on:\\s+(https?://\\S+)",
-      //   "uriFormat": "%s/swagger/index.html",
-      //   "timeout": 1000
-      // },
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)",
+        "uriFormat": "%s/swagger/index.html",
+        "timeout": 1000
+      },
       "env": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
