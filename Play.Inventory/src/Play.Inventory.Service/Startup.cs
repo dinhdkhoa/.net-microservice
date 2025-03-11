@@ -10,6 +10,7 @@ using Play.Common.MongoDB;
 using Play.Inventory.Service.Clients;
 using Play.Inventory.Service.Entities;
 using Polly;
+using Polly.Timeout;
 
 namespace Play.Inventory.Service
 {
@@ -31,7 +32,11 @@ namespace Play.Inventory.Service
 
             services.AddHttpClient<CatalogClient>(client => {
                 client.BaseAddress = new Uri("https://localhost:5001");
-            }).AddPolicyHandler(Policy.TimeoutAsync<HttpResponseMessage>(10));
+            })
+            .AddTransientHttpErrorPolicy(builder => builder.Or<TimeoutRejectedException>() // includes this to work with AddPolicyHandler => retry when TimeoutRejectedException 
+            .WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)) + TimeSpan.FromMilliseconds(new Random().Next(0 ,1000)) //random sleep time so instances won't burst catalog service
+            ))
+            .AddPolicyHandler(Policy.TimeoutAsync<HttpResponseMessage>(5));
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Play.Inventory.Service", Version = "v1" });
