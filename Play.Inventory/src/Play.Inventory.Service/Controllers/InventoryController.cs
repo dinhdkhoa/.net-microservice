@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.VisualBasic;
 using Play.Common;
 using Play.Inventory.Service.Clients;
 using Play.Inventory.Service.Dtos;
@@ -34,7 +33,7 @@ namespace Play.Inventory.Service.Controllers
 
             var catalogItems = await catalogClient.GetListCatalogAsync();
 
-            var inventoryItemEntities = await repo.GetListAsync(item => item.UserId == userId);
+            var inventoryItemEntities = await repo.GetAllAsync(item => item.UserId == userId);
 
             var inventoryItemDtos = inventoryItemEntities.Select(inventoryItem => {
                 var catalogItem = catalogItems.FirstOrDefault(c => c.Id == inventoryItem.CatalogItemId);

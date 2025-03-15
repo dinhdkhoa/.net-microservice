@@ -28,14 +28,14 @@ namespace Play.Catalog.Service.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var items = await repo.GetListAsync();
+            var items = await repo.GetAllAsync();
             return Ok(items.Select(item => item.ToItemDto()));
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
-            var item = await repo.GetByIdAsync(id);
+            var item = await repo.GetAsync(id);
 
             if(item == null){
                 return NotFound();
@@ -58,13 +58,13 @@ namespace Play.Catalog.Service.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var item = await repo.GetByIdAsync(id);
+            var item = await repo.GetAsync(id);
 
             if (item == null)
             {
                 return NotFound();
             }
-            await repo.DeleteAsync(id);
+            await repo.RemoveAsync(id);
             return NoContent();
         }
         [HttpPut("{id}")]
@@ -74,7 +74,7 @@ namespace Play.Catalog.Service.Controllers
             {
                 return UnprocessableEntity(ModelState);
             }
-            var item = await repo.GetByIdAsync(id);
+            var item = await repo.GetAsync(id);
 
             if (item == null)
             {
