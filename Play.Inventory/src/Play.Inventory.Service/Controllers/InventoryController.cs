@@ -33,7 +33,7 @@ namespace Play.Inventory.Service.Controllers
 
             var catalogItems = await catalogClient.GetListCatalogAsync();
 
-            var inventoryItemEntities = await repo.GetAllAsync(item => item.UserId == userId);
+            var inventoryItemEntities = await repo.GetListAsync(item => item.UserId == userId);
 
             var inventoryItemDtos = inventoryItemEntities.Select(inventoryItem => {
                 var catalogItem = catalogItems.FirstOrDefault(c => c.Id == inventoryItem.CatalogItemId);
