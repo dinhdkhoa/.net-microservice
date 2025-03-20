@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using MassTransit;
 using Play.Common;
@@ -22,11 +23,11 @@ namespace Play.Inventory.Service.Consumers
             if(item != null){
                 return ;
             }
-
-            item = new CatalogItem{
-                Id = item.Id,
-                Description= item.Description,
-                Name= item.Name
+            item = new CatalogItem
+            {
+                Id = message.Id,
+                Description = message.description,
+                Name = message.name,
             };
             await repo.CreateAsync(item);
         }

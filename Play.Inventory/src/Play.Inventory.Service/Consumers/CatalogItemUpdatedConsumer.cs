@@ -19,13 +19,13 @@ namespace Play.Inventory.Service.Consumers
             var message = context.Message;
             var item = await repo.GetByIdAsync(message.Id);
 
-            if (item != null)
+            if (item == null)
             {
                 item = new CatalogItem
                 {
-                    Id = item.Id,
-                    Description = item.Description,
-                    Name = item.Name
+                    Id = message.Id,
+                    Description = message.description,
+                    Name = message.name
                 };
                 await repo.CreateAsync(item);
             } else {
