@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Play.Catalog.Service.Entities;
 using Play.Common.MongoDB;
+using Play.Common.RabbitMQ;
 using Play.Common.Settings;
 
 namespace Play.Catalog.Service
@@ -27,9 +28,10 @@ namespace Play.Catalog.Service
 
             serviceSettings = Configuration.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>();
 
-           services.AddMongo().AddMongoRepository<Item>("items");
+            services.AddMongo().AddMongoRepository<Item>("items")
+            .AddRabbitMQ();
 
-          
+        
             services.AddControllers(options => {
                 options.SuppressAsyncSuffixInActionNames = false;
             });
