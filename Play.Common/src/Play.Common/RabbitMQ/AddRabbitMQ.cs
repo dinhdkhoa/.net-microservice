@@ -10,10 +10,14 @@ namespace Play.Common.RabbitMQ
 {
     public static class Extensions
     {
-        public static IServiceCollection AddRabbitMQ(this IServiceCollection services){
-            services.AddMassTransit(configure => {
+        public static IServiceCollection AddRabbitMQ(this IServiceCollection services)
+        {
+            services.AddMassTransit(configure =>
+            {
                 configure.AddConsumers(Assembly.GetEntryAssembly());
-                configure.UsingRabbitMq((seriveProvider, configurator) => {
+                configure.AddConfigureEndpointsCallback
+                configure.UsingRabbitMq((seriveProvider, configurator) =>
+                {
                     var config = seriveProvider.GetService<IConfiguration>();
                     var serviceSettings = config.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>();
                     var rabbitMQSettings = config.GetSection(nameof(RabbitMQSettings)).Get<RabbitMQSettings>();
@@ -25,5 +29,6 @@ namespace Play.Common.RabbitMQ
 
             return services;
 
-        }}
+        }
+    }
 }
