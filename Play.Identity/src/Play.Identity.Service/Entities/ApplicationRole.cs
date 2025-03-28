@@ -2,14 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AspNetCore.Identity.MongoDbCore.Models;
-using MongoDbGenericRepository.Attributes;
+using AspNetCore.Identity.Mongo.Model;
+using MongoDB.Bson;
 
 namespace Play.Identity.Service.Entities
 {
-    [CollectionName("Roles")]
-
-    public class ApplicationRole : MongoIdentityRole<Guid>
+    public class ApplicationRole : MongoRole<Guid>
     {
         
     }
