@@ -10,5 +10,6 @@ namespace Play.Identity.Service.Entities
     public class ApplicationUser : MongoUser<Guid>
     {
         public decimal Gil { get; set; }
+        public DateTime CreatedOn { get; set; }
     }
 }

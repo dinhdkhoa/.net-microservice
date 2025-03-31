@@ -20,7 +20,7 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
         mongo.ConnectionString =  $"{mongoDbSettings.ConnectionString}/{serviceSettings.ServiceName}";
     }).AddDefaultTokenProviders()
     .AddDefaultUI();
-builder.Services.AddScoped<SignInManager<ApplicationUser>>(); // 👈 Add this line
+builder.Services.AddScoped<SignInManager<ApplicationUser>>();
 
 builder.Services.AddControllers();
 builder.Services.AddRazorPages();

@@ -116,6 +116,7 @@ namespace Play.Identity.Service.Areas.Identity.Pages.Account
             {
                 var user = CreateUser();
                 user.Gil = StartingGil;
+                user.CreatedOn = DateTime.UtcNow;
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
