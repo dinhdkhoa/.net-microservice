@@ -8,6 +8,8 @@
 
   <ItemGroup>
     <PackageReference Include="AspNetCore.Identity.Mongo" Version="10.1.0" />
+    <PackageReference Include="Duende.IdentityServer" Version="7.2.0" />
+    <PackageReference Include="Duende.IdentityServer.AspNetIdentity" Version="7.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.14" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.14" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />

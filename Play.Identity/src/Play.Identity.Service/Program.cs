@@ -6,6 +6,7 @@ using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Bson;
 using Microsoft.AspNetCore.Identity;
+using Play.Identity.Service.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,7 @@ BsonSerializer.RegisterSerializer(new GuidSerializer(BsonType.String));
 
 var serviceSettings = builder.Configuration.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>();
 var mongoDbSettings = builder.Configuration.GetSection(nameof(MongoDbSettings)).Get<MongoDbSettings>();
+var identityServerSettings = new IdentityServerSettings();
 
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
     .AddMongoDbStores<ApplicationUser, ApplicationRole, Guid>(mongo =>
@@ -20,6 +22,13 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
         mongo.ConnectionString =  $"{mongoDbSettings.ConnectionString}/{serviceSettings.ServiceName}";
     }).AddDefaultTokenProviders()
     .AddDefaultUI();
+
+builder.Services.AddIdentityServer()
+.AddAspNetIdentity<ApplicationUser>() //Connect IdentityServer To AspNetIdentity
+.AddInMemoryApiScopes(identityServerSettings.ApiScopes)
+.AddInMemoryClients(identityServerSettings.Clients)
+.AddInMemoryIdentityResources(identityServerSettings.IdentityResources); // enable OpenId
+
 builder.Services.AddScoped<SignInManager<ApplicationUser>>();
 
 builder.Services.AddControllers();
@@ -41,6 +50,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseAuthentication();
+app.UseIdentityServer();
 app.UseAuthorization();
 
 app.MapControllers();
