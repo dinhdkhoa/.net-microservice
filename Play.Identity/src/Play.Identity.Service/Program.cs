@@ -1,5 +1,4 @@
 using AspNetCore.Identity.Mongo;
-using System;
 using Play.Common.Settings;
 using Play.Identity.Service.Entities;
 using MongoDB.Bson.Serialization;
@@ -14,7 +13,7 @@ BsonSerializer.RegisterSerializer(new GuidSerializer(BsonType.String));
 
 var serviceSettings = builder.Configuration.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>();
 var mongoDbSettings = builder.Configuration.GetSection(nameof(MongoDbSettings)).Get<MongoDbSettings>();
-var identityServerSettings = new IdentityServerSettings();
+var identityServerSettings = builder.Configuration.GetSection(nameof(IdentityServerSettings)).Get<IdentityServerSettings>();
 
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
     .AddMongoDbStores<ApplicationUser, ApplicationRole, Guid>(mongo =>
@@ -23,7 +22,11 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
     }).AddDefaultTokenProviders()
     .AddDefaultUI();
 
-builder.Services.AddIdentityServer()
+builder.Services.AddIdentityServer(options => {
+    options.Events.RaiseSuccessEvents = true;
+    options.Events.RaiseFailureEvents = true;
+    options.Events.RaiseErrorEvents = true;
+})
 .AddAspNetIdentity<ApplicationUser>() //Connect IdentityServer To AspNetIdentity
 .AddInMemoryApiScopes(identityServerSettings.ApiScopes)
 .AddInMemoryClients(identityServerSettings.Clients)
@@ -57,3 +60,54 @@ app.MapControllers();
 app.MapRazorPages();
 
 app.Run();
+
+
+// "IdentityServerSettings": {
+//     "Clients": [
+//       {
+//         "ClientId": "frontend",
+//         "AllowedGrantTypes": [
+//           "authorization_code"
+//         ],
+//         "RequireClientSecret": false,
+//         "RedirectUris": [
+//           "http://localhost:3000/authentication/login-callback"
+//         ],
+//         "AllowedScopes": [
+//           "openid",
+//           "profile",
+//           "catalog.fullaccess",
+//           "inventory.fullaccess",
+//           "trading.fullaccess",
+//           "IdentityServerApi",
+//           "roles"
+//         ],
+//         "AlwaysIncludeUserClaimsInIdToken" : true,
+//         "PostLogoutRedirectUris":[
+//           "http://localhost:3000/authentication/logout-callback"
+//         ]
+//       },      
+//       {
+//         "ClientId": "postman",
+//         "AllowedGrantTypes": [
+//           "authorization_code"
+//         ],
+//         "RequireClientSecret": false,
+//         "RedirectUris": [
+//           "urn:ietf:wg:oauth:2.0:oob"
+//         ],
+//         "AllowedScopes": [
+//           "openid",
+//           "profile",
+//           "catalog.fullaccess",
+//           "catalog.readaccess",
+//           "catalog.writeaccess",
+//           "inventory.fullaccess",
+//           "trading.fullaccess",
+//           "IdentityServerApi",
+//           "roles"
+//         ],
+//         "AlwaysIncludeUserClaimsInIdToken" : true
+//       }
+//     ]
+//   }
