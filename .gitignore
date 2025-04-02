@@ -1,4 +1,5 @@
 **/obj/
 **/bin/
+**/keys/
 Play.Infra/data/*
 Play.Infra/rabbitmqdata/*
