@@ -1,4 +1,4 @@
-
+using System;
 using System.Reflection;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
@@ -15,7 +15,12 @@ namespace Play.Common.RabbitMQ
             services.AddMassTransit(configure =>
             {
                 configure.AddConsumers(Assembly.GetEntryAssembly());
-                configure.AddConfigureEndpointsCallback
+                configure.AddConfigureEndpointsCallback((context, name, cfg) =>
+                {
+                    cfg.UseDelayedRedelivery(r => r.Intervals(TimeSpan.FromMinutes(5), TimeSpan.FromMinutes(15), TimeSpan.FromMinutes(30)));
+                    cfg.UseMessageRetry(r => r.Immediate(5));
+                });
+
                 configure.UsingRabbitMq((seriveProvider, configurator) =>
                 {
                     var config = seriveProvider.GetService<IConfiguration>();
