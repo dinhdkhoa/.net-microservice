@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using Play.Common.Identity;
 using Play.Common.MongoDB;
 using Play.Common.RabbitMQ;
 using Play.Inventory.Service.Clients;
@@ -31,9 +32,11 @@ namespace Play.Inventory.Service
             services.AddMongo()
             .AddMongoRepository<CatalogItem>("catalogitems")
             .AddMongoRepository<InventoryItem>("inventoryitems")
-            .AddRabbitMQ();
+            .AddRabbitMQ()
+            .AddJwtBearerAuthentication();
+            
             services.AddControllers();
-            AddCatalogHttpClient(services);
+            // AddCatalogHttpClient(services);
 
             services.AddSwaggerGen(c =>
             {
@@ -66,7 +69,8 @@ namespace Play.Inventory.Service
             app.UseHttpsRedirection();
 
             app.UseRouting();
-
+            
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

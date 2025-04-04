@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -6,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Play.Catalog.Service.Entities;
+using Play.Common.Identity;
 using Play.Common.MongoDB;
 using Play.Common.RabbitMQ;
 using Play.Common.Settings;
@@ -29,16 +29,11 @@ namespace Play.Catalog.Service
 
             serviceSettings = Configuration.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>();
 
-            services.AddMongo().AddMongoRepository<Item>("items")
-            .AddRabbitMQ();
+            services.AddMongo()
+                    .AddMongoRepository<Item>("items")
+                    .AddRabbitMQ()
+                    .AddJwtBearerAuthentication();
 
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options => {
-                options.Authority = "https://localhost:5212";
-                options.Audience = serviceSettings.ServiceName;
-            });
-
-        
             services.AddControllers(options => {
                 options.SuppressAsyncSuffixInActionNames = false;
             });

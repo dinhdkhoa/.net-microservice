@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Play.Common;
 using Play.Inventory.Service.Clients;
@@ -12,17 +13,18 @@ namespace Play.Inventory.Service.Controllers
 {
     [ApiController]
     [Route("items")]
+    [Authorize]
     public class InventoryController : ControllerBase
     {
         private readonly IRepository<InventoryItem> repo;
         private readonly IRepository<CatalogItem> catalogItemRepo;
-        private readonly CatalogClient catalogClient;
+        // private readonly CatalogClient catalogClient;
         
-        public InventoryController(IRepository<InventoryItem> _repo, IRepository<CatalogItem> _catalogItemRepo, CatalogClient _catalogClient)
+        public InventoryController(IRepository<InventoryItem> _repo, IRepository<CatalogItem> _catalogItemRepo)
         {
             repo = _repo;
             catalogItemRepo = _catalogItemRepo;
-            catalogClient = _catalogClient;
+            // catalogClient = _catalogClient;
         }
 
         [HttpGet]
@@ -67,6 +69,11 @@ namespace Play.Inventory.Service.Controllers
                     CatalogItemId = req.CatalogItemId
                 };
                 await repo.CreateAsync(newItem);
+                // await catalogItemRepo.CreateAsync(new CatalogItem{
+                //     Id =  req.CatalogItemId,
+                //     Description = "Waiting To Be Updated From Catalog Service",
+                //     Name = "Waiting To Be Updated From Catalog Service"
+                // });
             }
             else {
                 currentItem.Quantity += req.Quantity;
