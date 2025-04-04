@@ -33,6 +33,8 @@ builder.Services.AddIdentityServer(options => {
 .AddInMemoryClients(identityServerSettings.Clients)
 .AddInMemoryIdentityResources(identityServerSettings.IdentityResources); // enable OpenId
 
+builder.Services.AddLocalApiAuthentication();
+
 builder.Services.AddScoped<SignInManager<ApplicationUser>>();
 
 builder.Services.AddControllers();
