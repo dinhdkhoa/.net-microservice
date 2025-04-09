@@ -20,6 +20,8 @@ namespace Play.Catalog.Service.Controllers
     {
         private readonly IRepository<Item> repo;
         private readonly IPublishEndpoint publishEndpoint;
+        private const string AdminRole = "Admin";
+
         // private static readonly List<ItemDto> items = new(){
         //     new ItemDto( "Potion", "Restores a small amount of HP", 5),
         //     new ItemDto( "Antidote", "Cures poison", 7),
@@ -52,6 +54,7 @@ namespace Play.Catalog.Service.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = AdminRole)]
         public async Task<IActionResult> Add(CreateItemDto item)
         {
             if(!ModelState.IsValid)
@@ -64,6 +67,7 @@ namespace Play.Catalog.Service.Controllers
             return CreatedAtAction(nameof(GetById), new { id = newItem.Id }, newItem);
         }
         [HttpDelete("{id}")]
+        [Authorize(Roles = AdminRole)]
         public async Task<IActionResult> Delete(Guid id)
         {
             var item = await repo.GetByIdAsync(id);
@@ -78,6 +82,7 @@ namespace Play.Catalog.Service.Controllers
             return NoContent();
         }
         [HttpPut("{id}")]
+        [Authorize(Roles = AdminRole)]
         public async Task<IActionResult> Update(Guid id, UpdateItemDto req)
         {
             if (!ModelState.IsValid)

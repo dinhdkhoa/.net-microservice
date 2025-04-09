@@ -9,10 +9,11 @@ namespace Play.Identity.Service.Controllers
 {
     [ApiController]
     [Route("users")]
-    [Authorize(Policy = LocalApi.PolicyName)]
+    [Authorize(Policy = LocalApi.PolicyName, Roles = AdminRole)]
     public class UsersControllers : ControllerBase
     {
         private readonly UserManager<ApplicationUser> userManager;
+        private const string AdminRole = "Admin";
 
         public UsersControllers(UserManager<ApplicationUser> _userManager)
         {

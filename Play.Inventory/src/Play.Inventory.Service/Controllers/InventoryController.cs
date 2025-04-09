@@ -1,9 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Play.Common;
 using Play.Inventory.Service.Clients;
 using Play.Inventory.Service.Dtos;
@@ -13,10 +17,11 @@ namespace Play.Inventory.Service.Controllers
 {
     [ApiController]
     [Route("items")]
-    [Authorize]
     public class InventoryController : ControllerBase
     {
         private readonly IRepository<InventoryItem> repo;
+        private const string AdminRole = "Admin";
+
         private readonly IRepository<CatalogItem> catalogItemRepo;
         // private readonly CatalogClient catalogClient;
         
@@ -28,11 +33,17 @@ namespace Play.Inventory.Service.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<InventoryItemDto>>> GetAsync(Guid userId)
         {
             if (userId == Guid.Empty)
             {
                 return BadRequest();
+            }
+
+            var currentUserId = User.FindFirstValue(JwtRegisteredClaimNames.Sub);
+            if(Guid.Parse(currentUserId) != userId && !User.IsInRole(AdminRole)) {
+                return Forbid();    
             }
 
             // var catalogItems = await catalogClient.GetListCatalogAsync();
@@ -52,20 +63,17 @@ namespace Play.Inventory.Service.Controllers
             return Ok(inventoryItemDtos);
         }
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<InventoryItemDto>>> Create(GrantItemsDto req)
         {
-            if (req.UserId == Guid.Empty)
-            {
-                return BadRequest();
-            }
-
-            var currentItem = await repo.GetAsync(item => item.UserId == req.UserId && item.CatalogItemId == req.CatalogItemId);
+            var currentUserId = Guid.Parse(User.FindFirstValue(JwtRegisteredClaimNames.Sub));
+            var currentItem = await repo.GetAsync(item => item.UserId == currentUserId && item.CatalogItemId == req.CatalogItemId);
 
             if(currentItem == null){
                 var newItem = new InventoryItem{
                     AcquiredDate = DateTimeOffset.Now,
                     Quantity = req.Quantity,
-                    UserId = req.UserId,
+                    UserId = currentUserId,
                     CatalogItemId = req.CatalogItemId
                 };
                 await repo.CreateAsync(newItem);
