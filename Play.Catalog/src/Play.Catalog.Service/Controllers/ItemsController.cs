@@ -35,6 +35,7 @@ namespace Play.Catalog.Service.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = Policies.Read)]
         public async Task<IActionResult> Get()
         {
             var items = await repo.GetListAsync();
@@ -54,7 +55,7 @@ namespace Play.Catalog.Service.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = AdminRole)]
+        [Authorize(Policy = Policies.Write)]
         public async Task<IActionResult> Add(CreateItemDto item)
         {
             if(!ModelState.IsValid)
@@ -67,7 +68,7 @@ namespace Play.Catalog.Service.Controllers
             return CreatedAtAction(nameof(GetById), new { id = newItem.Id }, newItem);
         }
         [HttpDelete("{id}")]
-        [Authorize(Roles = AdminRole)]
+        [Authorize(Policy = Policies.Write)]
         public async Task<IActionResult> Delete(Guid id)
         {
             var item = await repo.GetByIdAsync(id);
@@ -82,7 +83,7 @@ namespace Play.Catalog.Service.Controllers
             return NoContent();
         }
         [HttpPut("{id}")]
-        [Authorize(Roles = AdminRole)]
+        [Authorize(Policy = Policies.Write)]
         public async Task<IActionResult> Update(Guid id, UpdateItemDto req)
         {
             if (!ModelState.IsValid)
