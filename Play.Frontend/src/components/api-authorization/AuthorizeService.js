@@ -20,9 +20,15 @@ export class AuthorizeService {
         if (this._user && this._user.profile) {
             return this._user.profile;
         }
-
+        
         await this.ensureUserManagerInitialized();
         const user = await this.userManager.getUser();
+        const access_token = await this.getAccessToken()
+        const decodecAT = this.decodeJWT(access_token)
+        if(decodecAT != ''){
+            const { role } = this.decodeJWT(access_token)
+            user.profile.role = role
+        }
         return user && user.profile;
     }
 
@@ -31,6 +37,35 @@ export class AuthorizeService {
         const user = await this.userManager.getUser();
         return user && user.access_token;
     }
+
+    decodeJWT(token) {
+    if(!token) return '';
+    const jwtParts = token.split('.');
+    if (jwtParts.length !== 3) {
+        throw new Error("JWT does not have 3 parts.");
+    }
+
+    const header = jwtParts[0];
+    const decodedHeader = this.base64UrlDecode(header);
+
+    const payload = jwtParts[1];
+    const decodedPayload = this.base64UrlDecode(payload);
+    return JSON.parse(decodedPayload)
+}
+
+    base64UrlDecode(input) {
+        let base64 = input.replace(/-/g, '+').replace(/_/g, '/');
+
+        switch (base64.length % 4) {
+            case 2: base64 += '=='; break;
+            case 3: base64 += '='; break;
+        }
+
+        const decodedBytes = atob(base64);
+        return decodedBytes;
+    }
+
+
 
     // We try to authenticate the user in three different ways:
     // 1) We try to see if we can authenticate the user silently. This happens

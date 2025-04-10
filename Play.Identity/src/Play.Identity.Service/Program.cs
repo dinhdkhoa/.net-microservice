@@ -49,11 +49,15 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+var AllowedOriginSettings = builder.Configuration["AllowedOrigin"];
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseCors(builder => {
+        builder.WithOrigins(AllowedOriginSettings).AllowAnyHeader().AllowAnyMethod();
+    });
 }
 
 app.UseHttpsRedirection();
@@ -67,54 +71,3 @@ app.MapControllers();
 app.MapRazorPages();
 
 app.Run();
-
-
-// "IdentityServerSettings": {
-//     "Clients": [
-//       {
-//         "ClientId": "frontend",
-//         "AllowedGrantTypes": [
-//           "authorization_code"
-//         ],
-//         "RequireClientSecret": false,
-//         "RedirectUris": [
-//           "http://localhost:3000/authentication/login-callback"
-//         ],
-//         "AllowedScopes": [
-//           "openid",
-//           "profile",
-//           "catalog.fullaccess",
-//           "inventory.fullaccess",
-//           "trading.fullaccess",
-//           "IdentityServerApi",
-//           "roles"
-//         ],
-//         "AlwaysIncludeUserClaimsInIdToken" : true,
-//         "PostLogoutRedirectUris":[
-//           "http://localhost:3000/authentication/logout-callback"
-//         ]
-//       },      
-//       {
-//         "ClientId": "postman",
-//         "AllowedGrantTypes": [
-//           "authorization_code"
-//         ],
-//         "RequireClientSecret": false,
-//         "RedirectUris": [
-//           "urn:ietf:wg:oauth:2.0:oob"
-//         ],
-//         "AllowedScopes": [
-//           "openid",
-//           "profile",
-//           "catalog.fullaccess",
-//           "catalog.readaccess",
-//           "catalog.writeaccess",
-//           "inventory.fullaccess",
-//           "trading.fullaccess",
-//           "IdentityServerApi",
-//           "roles"
-//         ],
-//         "AlwaysIncludeUserClaimsInIdToken" : true
-//       }
-//     ]
-//   }

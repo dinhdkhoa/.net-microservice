@@ -1,0 +1,2 @@
+*.cs linguist-language=CSharp
+*.js linguist-ignore=true
