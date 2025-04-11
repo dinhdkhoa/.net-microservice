@@ -28,7 +28,7 @@ namespace Play.Common.RabbitMQ
             {
                 // cfg.UseDelayedRedelivery(r => r.Intervals(TimeSpan.FromMinutes(5), TimeSpan.FromMinutes(15), TimeSpan.FromMinutes(30)));
                 if(configRetries == null){
-                    configRetries = (retryConfigurator) => retryConfigurator.Intervals(TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(5));
+                    configRetries = (retryConfigurator) => retryConfigurator.Interval(3,TimeSpan.FromSeconds(5));
                 }
                 cfg.UseMessageRetry(configRetries);
             });
