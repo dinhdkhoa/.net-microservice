@@ -6,9 +6,9 @@
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build",
-      "program": "${workspaceFolder}/Play.Inventory.Service/bin/Debug/net5.0/Play.Inventory.Service.dll", // Adjust the path if needed
+      "program": "${workspaceFolder}/src/Play.Inventory.Service/bin/Debug/net5.0/Play.Inventory.Service.dll", // Adjust the path if needed
       "args": [],
-      "cwd": "${workspaceFolder}/Play.Inventory.Service",
+      "cwd": "${workspaceFolder}/src/Play.Inventory.Service",
       "stopAtEntry": false,
       "serverReadyAction": {
         "action": "openExternally",
@@ -20,7 +20,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "sourceFileMap": {
-        "/Views": "${workspaceFolder}/Play.Inventory.Service/Views"
+        "/Views": "${workspaceFolder}/src/Play.Inventory.Service/Views"
       }
     }
   ]

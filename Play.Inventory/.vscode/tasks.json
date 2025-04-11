@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/Play.Inventory.Service/Play.Inventory.Service.csproj",
+                "${workspaceFolder}/src/Play.Inventory.Service/Play.Inventory.Service.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary;ForceNoAlign"
             ],
@@ -19,7 +19,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/Play.Inventory.Service/Play.Inventory.Service.csproj",
+                "${workspaceFolder}/src/Play.Inventory.Service/Play.Inventory.Service.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary;ForceNoAlign"
             ],
@@ -33,7 +33,7 @@
                 "watch",
                 "run",
                 "--project",
-                "${workspaceFolder}/Play.Inventory.Service/Play.Inventory.Service.csproj"
+                "${workspaceFolder}/src/Play.Inventory.Service/Play.Inventory.Service.csproj"
             ],
             "problemMatcher": "$msCompile"
         }
