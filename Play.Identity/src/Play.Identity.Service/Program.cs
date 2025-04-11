@@ -7,6 +7,9 @@ using MongoDB.Bson;
 using Microsoft.AspNetCore.Identity;
 using Play.Identity.Service.Settings;
 using Play.Identity.Service.HostedServices;
+using Play.Common.RabbitMQ;
+using MassTransit;
+using Play.Identity.Service.Exceptions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +27,12 @@ builder.Services
         mongo.ConnectionString =  $"{mongoDbSettings.ConnectionString}/{serviceSettings.ServiceName}";
     }).AddDefaultTokenProviders()
     .AddDefaultUI();
+
+builder.Services.AddRabbitMQ(retryConfig => {
+    retryConfig.Interval(3, TimeSpan.FromSeconds(5));
+    retryConfig.Ignore(typeof(InsufficientFundsException));
+    retryConfig.Ignore(typeof(UnknownUserException));
+});
 
 builder.Services.AddIdentityServer(options => {
     options.Events.RaiseSuccessEvents = true;
