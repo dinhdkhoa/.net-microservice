@@ -10,30 +10,38 @@ namespace Play.Common.RabbitMQ
 {
     public static class Extensions
     {
-        public static IServiceCollection AddRabbitMQ(this IServiceCollection services)
+        public static IServiceCollection AddRabbitMQ(this IServiceCollection services, Action<IRetryConfigurator> configRetries = null)
         {
             services.AddMassTransit(configure =>
             {
                 configure.AddConsumers(Assembly.GetEntryAssembly());
-                configure.AddConfigureEndpointsCallback((context, name, cfg) =>
-                {
-                    cfg.UseDelayedRedelivery(r => r.Intervals(TimeSpan.FromMinutes(5), TimeSpan.FromMinutes(15), TimeSpan.FromMinutes(30)));
-                    cfg.UseMessageRetry(r => r.Immediate(5));
-                });
-
-                configure.UsingRabbitMq((seriveProvider, configurator) =>
-                {
-                    var config = seriveProvider.GetService<IConfiguration>();
-                    var serviceSettings = config.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>();
-                    var rabbitMQSettings = config.GetSection(nameof(RabbitMQSettings)).Get<RabbitMQSettings>();
-
-                    configurator.Host(rabbitMQSettings.Host);
-                    configurator.ConfigureEndpoints(seriveProvider, new KebabCaseEndpointNameFormatter(serviceSettings.ServiceName, false));
-                });
+                configure.UsePlayEconomyRabbitMQ(configRetries);
             });
 
             return services;
 
+        }
+
+        public static void UsePlayEconomyRabbitMQ(this IBusRegistrationConfigurator configure, Action<IRetryConfigurator> configRetries = null)
+        {
+            configure.AddConfigureEndpointsCallback((context, name, cfg) =>
+            {
+                // cfg.UseDelayedRedelivery(r => r.Intervals(TimeSpan.FromMinutes(5), TimeSpan.FromMinutes(15), TimeSpan.FromMinutes(30)));
+                if(configRetries == null){
+                    configRetries = (retryConfigurator) => retryConfigurator.Intervals(TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(5));
+                }
+                cfg.UseMessageRetry(configRetries);
+            });
+
+            configure.UsingRabbitMq((seriveProvider, configurator) =>
+            {
+                var config = seriveProvider.GetService<IConfiguration>();
+                var serviceSettings = config.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>();
+                var rabbitMQSettings = config.GetSection(nameof(RabbitMQSettings)).Get<RabbitMQSettings>();
+
+                configurator.Host(rabbitMQSettings.Host);
+                configurator.ConfigureEndpoints(seriveProvider, new KebabCaseEndpointNameFormatter(serviceSettings.ServiceName, false));
+            });
         }
     }
 }
