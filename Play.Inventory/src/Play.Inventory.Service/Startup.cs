@@ -1,5 +1,6 @@
 using System;
 using System.Net.Http;
+using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -11,6 +12,7 @@ using Play.Common.MongoDB;
 using Play.Common.RabbitMQ;
 using Play.Inventory.Service.Clients;
 using Play.Inventory.Service.Entities;
+using Play.Inventory.Service.Exceptions;
 using Polly;
 using Polly.Timeout;
 
@@ -32,7 +34,10 @@ namespace Play.Inventory.Service
             services.AddMongo()
             .AddMongoRepository<CatalogItem>("catalogitems")
             .AddMongoRepository<InventoryItem>("inventoryitems")
-            .AddRabbitMQ()
+            .AddRabbitMQ(retryConfig => {
+                retryConfig.Interval(3, TimeSpan.FromSeconds(5));
+                retryConfig.Ignore(typeof(UnknownItemException));
+            })
             .AddJwtBearerAuthentication();
             
             services.AddControllers();
