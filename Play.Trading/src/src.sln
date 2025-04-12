@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Play.Trading.Service", "Play.Trading.Service\Play.Trading.Service.csproj", "{072EAD0C-BCC8-428D-C266-BE363E0F08BF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{072EAD0C-BCC8-428D-C266-BE363E0F08BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{072EAD0C-BCC8-428D-C266-BE363E0F08BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{072EAD0C-BCC8-428D-C266-BE363E0F08BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{072EAD0C-BCC8-428D-C266-BE363E0F08BF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8AE1DF4B-697D-465F-905A-B5349AFE6AAA}
+	EndGlobalSection
+EndGlobal
