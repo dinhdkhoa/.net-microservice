@@ -1,16 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using Play.Common.Identity;
+using Play.Common.MongoDB;
+using Play.Common.RabbitMQ;
+using Play.Common.Settings;
+using Play.Trading.Service.StateMachines;
 
 namespace Play.Trading.Service
 {
@@ -26,6 +25,10 @@ namespace Play.Trading.Service
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+            services.AddMongo()
+                    .AddJwtBearerAuthentication();
+            AddMassTransit(services);
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
@@ -48,12 +51,30 @@ namespace Play.Trading.Service
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
+        }
+
+        private void AddMassTransit(IServiceCollection services){
+            services.AddMassTransit(configure => 
+            {
+                configure.UsePlayEconomyRabbitMQ();
+                configure.AddSagaStateMachine<PurchaseStateMachine, PurchaseState>().MongoDbRepository(
+                    r => {
+                        var mongoDbSettings = Configuration.GetSection(nameof(MongoDbSettings)).Get<MongoDbSettings>();
+                        var serviceSettings = Configuration.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>();
+
+                        r.Connection = mongoDbSettings.ConnectionString;
+                        r.DatabaseName = serviceSettings.ServiceName;
+                    }
+                );
+            });
+            services.AddMassTransitHostedService();
         }
     }
 }
