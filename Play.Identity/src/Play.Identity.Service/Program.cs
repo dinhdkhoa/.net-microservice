@@ -10,6 +10,7 @@ using Play.Identity.Service.HostedServices;
 using Play.Common.RabbitMQ;
 using MassTransit;
 using Play.Identity.Service.Exceptions;
+using GreenPipes;
 
 var builder = WebApplication.CreateBuilder(args);
 

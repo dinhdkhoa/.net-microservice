@@ -1,6 +1,9 @@
 using System;
 using System.Reflection;
+using GreenPipes;
+using GreenPipes.Configurators;
 using MassTransit;
+using MassTransit.Definition;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -24,7 +27,7 @@ namespace Play.Common.RabbitMQ
 
         public static void UsePlayEconomyRabbitMQ(this IBusRegistrationConfigurator configure, Action<IRetryConfigurator> configRetries = null)
         {
-            configure.AddConfigureEndpointsCallback((context, name, cfg) =>
+            configure.AddConfigureEndpointsCallback((queueName, cfg) =>
             {
                 // cfg.UseDelayedRedelivery(r => r.Intervals(TimeSpan.FromMinutes(5), TimeSpan.FromMinutes(15), TimeSpan.FromMinutes(30)));
                 if(configRetries == null){
