@@ -10,4 +10,13 @@ namespace Play.Trading.Service
         [Required] Guid? ItemId,
         [Range(1,100)] int Quantity
     );
+
+    public record PurchaseDto( 
+        Guid UserId, Guid ItemId,
+        decimal? PurchaseTotal,
+        int Quantity, 
+        string State, 
+        string Reason , 
+        DateTimeOffset ReceivedAt, 
+        DateTimeOffset LastUpdated);
 }

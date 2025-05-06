@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using MassTransit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Play.Trading.Service.StateMachines;
 
 namespace Play.Trading.Service.Controllers
 {
@@ -15,10 +16,30 @@ namespace Play.Trading.Service.Controllers
     public class PurchaseController : ControllerBase
     {
         public readonly IPublishEndpoint publishEndpoint;
+        public readonly IRequestClient<GetPurchaseState> purchaseClient;
 
-        public PurchaseController(IPublishEndpoint publishEndpoint)
+        public PurchaseController(IPublishEndpoint publishEndpoint, IRequestClient<GetPurchaseState> purchaseClient)
         {
             this.publishEndpoint = publishEndpoint;
+            this.purchaseClient = purchaseClient;
+        }
+
+        [HttpGet("status/{correlationId}")]
+        public async Task<IActionResult> GetStatusAsync(Guid correlationId)
+        {
+            var res = await purchaseClient.GetResponse<PurchaseState>(new GetPurchaseState(correlationId));
+            var purchaseState = res.Message;
+            var purchase = new PurchaseDto(
+                purchaseState.UserId,
+                purchaseState.ItemId,
+                purchaseState.PurchaseTotal,
+                purchaseState.Quantity,
+                purchaseState.CurrentState,
+                purchaseState.ErrorMessage,
+                purchaseState.ReceivedAt,
+                purchaseState.UpdatedAt
+            );
+            return Ok(purchase);
         }
 
         [HttpPost]
@@ -35,7 +56,7 @@ namespace Play.Trading.Service.Controllers
             
             await publishEndpoint.Publish(message);
 
-            return Accepted();
+            return AcceptedAtAction(nameof(GetStatusAsync), new { CorrelationId }, new { CorrelationId });
         }
     }
 }
