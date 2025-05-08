@@ -1,6 +1,7 @@
 using System;
 using Automatonymous;
-using MassTransit;
+using Play.Trading.Service.Activities;
+using Play.Trading.Service.Contracts;
 
 namespace Play.Trading.Service.StateMachines
 {
@@ -38,8 +39,16 @@ namespace Play.Trading.Service.StateMachines
                     context.Instance.ReceivedAt = DateTimeOffset.UtcNow;
                     context.Instance.UpdatedAt = context.Instance.ReceivedAt;
                 })
+                .Activity(x => x.OfType<CalculatePurchaseTotalActivity>())
                 .TransitionTo(Accepted)
-            );
+                .Catch<Exception>(ex => ex.
+                        Then(context =>
+                        {
+                            context.Instance.ErrorMessage = context.Exception.Message;
+                            context.Instance.UpdatedAt = DateTimeOffset.UtcNow;
+                        })
+                        .TransitionTo(Faulted)
+            ));
         }
 
         private void ConfigureAny()
