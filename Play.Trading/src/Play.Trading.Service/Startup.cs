@@ -80,7 +80,9 @@ namespace Play.Trading.Service
                     retryConfig.Ignore(typeof(UnknownItemException));
                 });
                 configure.AddConsumers(Assembly.GetEntryAssembly());
-                configure.AddSagaStateMachine<PurchaseStateMachine, PurchaseState>().MongoDbRepository(
+                configure.AddSagaStateMachine<PurchaseStateMachine, PurchaseState>(sagaConfig => {
+                    sagaConfig.UseInMemoryOutbox();
+                }).MongoDbRepository(
                     r => {
                         var mongoDbSettings = Configuration.GetSection(nameof(MongoDbSettings)).Get<MongoDbSettings>();
                         var serviceSettings = Configuration.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>();
