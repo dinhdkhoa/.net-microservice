@@ -20,7 +20,7 @@ namespace Play.Common.RabbitMQ
                 configure.AddConsumers(Assembly.GetEntryAssembly());
                 configure.UsePlayEconomyRabbitMQ(configRetries);
             });
-
+            services.AddMassTransitHostedService();
             return services;
 
         }

@@ -2,6 +2,7 @@ using System;
 using Automatonymous;
 using Play.Trading.Service.Activities;
 using Play.Trading.Service.Contracts;
+using static Play.Inventory.Contracts.Contracts;
 
 namespace Play.Trading.Service.StateMachines
 {
@@ -13,18 +14,21 @@ namespace Play.Trading.Service.StateMachines
         public State Faulted {get; }
         public Event<PurchaseRequested> PurchaseRequested { get; }
         public Event<GetPurchaseState> GetPurchaseState { get; }
+        public Event<InventoryItemGranted> InventoryItemGranted { get; }
         public PurchaseStateMachine()
         {
             InstanceState(state => state.CurrentState);
             ConfigureEvents();
             ConfigureInitState();
             ConfigureAny();
+            ConfigureAccepted();
         }
 
         private void ConfigureEvents()
         {
             Event(() => PurchaseRequested);
             Event(() => GetPurchaseState);
+            Event(() => InventoryItemGranted);
         }
 
         private void ConfigureInitState()
@@ -40,6 +44,12 @@ namespace Play.Trading.Service.StateMachines
                     context.Instance.UpdatedAt = context.Instance.ReceivedAt;
                 })
                 .Activity(x => x.OfType<CalculatePurchaseTotalActivity>())
+                .Send(context => new GrantedItem(
+                    context.Instance.UserId,
+                    context.Instance.ItemId,
+                    context.Instance.Quantity,
+                    context.Instance.CorrelationId
+                ))
                 .TransitionTo(Accepted)
                 .Catch<Exception>(ex => ex.
                         Then(context =>
@@ -49,6 +59,16 @@ namespace Play.Trading.Service.StateMachines
                         })
                         .TransitionTo(Faulted)
             ));
+        }
+
+        private void ConfigureAccepted()
+        {
+            During(Accepted,
+                When(InventoryItemGranted)
+                .Then(context => {
+                    context.Instance.UpdatedAt = DateTimeOffset.UtcNow;
+                })
+                .TransitionTo(ItemsGranted));
         }
 
         private void ConfigureAny()
