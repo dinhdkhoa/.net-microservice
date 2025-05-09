@@ -13,10 +13,12 @@ using Play.Common.Identity;
 using Play.Common.MongoDB;
 using Play.Common.RabbitMQ;
 using Play.Common.Settings;
+using Play.Trading.Service.Contracts;
 using Play.Trading.Service.Entities;
 using Play.Trading.Service.Exceptions;
 using Play.Trading.Service.Settings;
 using Play.Trading.Service.StateMachines;
+using static Play.Identity.Contracts.Contracts;
 using static Play.Inventory.Contracts.Contracts;
 
 namespace Play.Trading.Service
@@ -95,6 +97,7 @@ namespace Play.Trading.Service
 
             var queueSettings = Configuration.GetSection(nameof(QueueSettings)).Get<QueueSettings>();
             EndpointConvention.Map<GrantedItem>(new Uri(queueSettings.GrantItemsQueueAddress));
+            EndpointConvention.Map<DebitGil>(new Uri(queueSettings.DebitGilQueueAddress));
 
             services.AddMassTransitHostedService();
             services.AddGenericRequestClient();

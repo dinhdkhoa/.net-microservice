@@ -6,7 +6,7 @@
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build",
-      "program": "${workspaceFolder}/src/Play.Identity.Service/bin/Debug/net5.0/Play.Identity.Service.dll", // Adjust the path if needed
+      "program": "${workspaceFolder}/src/Play.Identity.Service/bin/Debug/net8.0/Play.Identity.Service.dll", // Adjust the path if needed
       "args": [],
       "cwd": "${workspaceFolder}/src/Play.Identity.Service",
       "stopAtEntry": false,

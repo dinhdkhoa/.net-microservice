@@ -33,6 +33,8 @@ namespace Play.Identity.Service.Consumers
                 throw new InsufficientFundsException(message.UserId, message.Gil);
             }
 
+            await _userManager.UpdateAsync(user);
+
             await context.Publish(new GilDebited(message.CorrelationId));
         }
     }
