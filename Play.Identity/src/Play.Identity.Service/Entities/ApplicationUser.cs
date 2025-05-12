@@ -10,6 +10,7 @@ namespace Play.Identity.Service.Entities
     public class ApplicationUser : MongoUser<Guid>
     {
         public decimal Gil { get; set; }
+        public HashSet<Guid> MesssageIds { get; set; } = new();
         public DateTime CreatedOn { get; set; }
     }
 }

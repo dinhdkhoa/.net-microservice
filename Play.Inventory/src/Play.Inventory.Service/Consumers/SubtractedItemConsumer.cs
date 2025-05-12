@@ -33,9 +33,11 @@ namespace Play.Inventory.Service.Consumers
             var currentItem = await inventoryRepo.GetAsync(item => item.UserId == message.UserId 
                                                             && item.CatalogItemId == message.CatalogItemId);
 
-            if (currentItem != null)
+
+            if (currentItem != null && !currentItem.MesssageIds.Contains(context.MessageId.Value))
             {
                 currentItem.Quantity -= message.Quantity;
+                currentItem.MesssageIds.Add(context.MessageId.Value);
                 await inventoryRepo.UpdateAsync(currentItem);
 
                 if (currentItem.Quantity <= 0)

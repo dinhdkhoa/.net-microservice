@@ -10,6 +10,7 @@ namespace Play.Inventory.Service.Consumers
 {
     public class GrantedItemConsumer : IConsumer<GrantedItem>
     {
+        private static int retry = 0;
         private readonly IRepository<InventoryItem> inventoryRepo;
 
         private readonly IRepository<CatalogItem> catalogItemRepo;
@@ -39,12 +40,17 @@ namespace Play.Inventory.Service.Consumers
                     AcquiredDate = DateTimeOffset.Now,
                     Quantity = message.Quantity,
                     UserId = message.UserId,
-                    CatalogItemId = message.CatalogItemId
+                    CatalogItemId = message.CatalogItemId,
                 };
+                newItem.MesssageIds.Add(context.MessageId.Value);
                 await inventoryRepo.CreateAsync(newItem);
             }
             else
-            {
+            {   
+                if(currentItem.MesssageIds.Contains(context.MessageId.Value)){
+                    await context.Publish(new InventoryItemGranted(message.CorrelationId));
+                    return;
+                }
                 currentItem.Quantity += message.Quantity;
                 await inventoryRepo.UpdateAsync(currentItem);
             }

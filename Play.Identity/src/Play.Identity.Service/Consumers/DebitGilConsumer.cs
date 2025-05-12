@@ -26,6 +26,12 @@ namespace Play.Identity.Service.Consumers
                 throw new UnknownUserException(message.UserId);
             }
 
+            if (user.MesssageIds.Contains(context.MessageId.Value))
+            {
+                await context.Publish(new GilDebited(message.CorrelationId));
+                return;
+            }
+
             user.Gil -= message.Gil;
 
             if(user.Gil < 0)
@@ -33,6 +39,7 @@ namespace Play.Identity.Service.Consumers
                 throw new InsufficientFundsException(message.UserId, message.Gil);
             }
 
+            user.MesssageIds.Add(context.MessageId.Value);
             await _userManager.UpdateAsync(user);
 
             await context.Publish(new GilDebited(message.CorrelationId));
