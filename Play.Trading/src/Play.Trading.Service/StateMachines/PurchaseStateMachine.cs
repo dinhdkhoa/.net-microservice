@@ -28,6 +28,7 @@ namespace Play.Trading.Service.StateMachines
             ConfigureAny();
             ConfigureAccepted();
             ConfigureItemsGranted();
+            ConfigureCompleted();
             ConfigureFaulted();
         }
 
@@ -78,6 +79,7 @@ namespace Play.Trading.Service.StateMachines
         private void ConfigureAccepted()
         {
             During(Accepted,
+                Ignore(PurchaseRequested),
                 When(InventoryItemGranted)
                 .Then(context => {
                     context.Instance.UpdatedAt = DateTimeOffset.UtcNow;
@@ -99,6 +101,8 @@ namespace Play.Trading.Service.StateMachines
         private void ConfigureItemsGranted()
         {
             During(ItemsGranted,
+                Ignore(PurchaseRequested),
+                Ignore(InventoryItemGranted),
                 When(GilDebited)
                 .Then(context => {
                     context.Instance.UpdatedAt = DateTimeOffset.UtcNow;
@@ -124,6 +128,15 @@ namespace Play.Trading.Service.StateMachines
             DuringAny(
                 When(GetPurchaseState)
                 .Respond(x => x.Instance)
+            );
+        }
+
+        private void ConfigureCompleted()
+        {
+            During(Completed,
+                Ignore(PurchaseRequested),
+                Ignore(InventoryItemGranted),
+                Ignore(GilDebited)
             );
         }
         private void ConfigureFaulted()
