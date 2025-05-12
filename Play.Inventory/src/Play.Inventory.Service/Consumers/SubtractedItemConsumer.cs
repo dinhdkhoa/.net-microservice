@@ -37,6 +37,11 @@ namespace Play.Inventory.Service.Consumers
             {
                 currentItem.Quantity -= message.Quantity;
                 await inventoryRepo.UpdateAsync(currentItem);
+
+                if (currentItem.Quantity <= 0)
+                {
+                    await inventoryRepo.DeleteAsync(currentItem.Id);
+                }
             }
 
             await context.Publish(new InventoryItemSubtracted(message.CorrelationId));

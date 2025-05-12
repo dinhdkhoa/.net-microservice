@@ -1,5 +1,6 @@
 using System;
 using Automatonymous;
+using MassTransit;
 using Play.Trading.Service.Activities;
 using Play.Trading.Service.Contracts;
 using static Play.Identity.Contracts.Contracts;
@@ -17,6 +18,8 @@ namespace Play.Trading.Service.StateMachines
         public Event<GetPurchaseState> GetPurchaseState { get; }
         public Event<InventoryItemGranted> InventoryItemGranted { get; }
         public Event<GilDebited> GilDebited { get; }
+        public Event<Fault<DebitGil>> GilDebitedFaulted { get; }
+        public Event<Fault<GrantedItem>> GrantedItemsFaulted { get; }
         public PurchaseStateMachine()
         {
             InstanceState(state => state.CurrentState);
@@ -25,6 +28,7 @@ namespace Play.Trading.Service.StateMachines
             ConfigureAny();
             ConfigureAccepted();
             ConfigureItemsGranted();
+            ConfigureFaulted();
         }
 
         private void ConfigureEvents()
@@ -33,6 +37,12 @@ namespace Play.Trading.Service.StateMachines
             Event(() => GetPurchaseState);
             Event(() => GilDebited);
             Event(() => InventoryItemGranted);
+            Event(() => GilDebitedFaulted, x => x.CorrelateById(
+                context => context.Message.Message.CorrelationId
+            ));
+            Event(() => GrantedItemsFaulted, x => x.CorrelateById(
+                context => context.Message.Message.CorrelationId
+            ));
         }
 
         private void ConfigureInitState()
@@ -77,7 +87,14 @@ namespace Play.Trading.Service.StateMachines
                     context.Instance.PurchaseTotal.Value,
                     context.Instance.CorrelationId
                 ))
-                .TransitionTo(ItemsGranted));
+                .TransitionTo(ItemsGranted),
+                When(GrantedItemsFaulted)
+                .Then(context =>
+                {
+                    context.Instance.UpdatedAt = DateTimeOffset.UtcNow;
+                    context.Instance.ErrorMessage = context.Data.Exceptions[0].Message;
+                })
+                .TransitionTo(Faulted));
         }
         private void ConfigureItemsGranted()
         {
@@ -86,7 +103,20 @@ namespace Play.Trading.Service.StateMachines
                 .Then(context => {
                     context.Instance.UpdatedAt = DateTimeOffset.UtcNow;
                 })
-                .TransitionTo(Completed));
+                .TransitionTo(Completed),
+                When(GilDebitedFaulted)
+                .Then(context =>
+                {
+                    context.Instance.UpdatedAt = DateTimeOffset.UtcNow;
+                    context.Instance.ErrorMessage = context.Data.Exceptions[0].Message;
+                })
+                .Send(context => new SubtractedItem(
+                    context.Instance.UserId,
+                    context.Instance.ItemId,
+                    context.Instance.Quantity,
+                    context.Instance.CorrelationId
+                ))
+                .TransitionTo(Faulted));
         }
 
         private void ConfigureAny()
@@ -94,6 +124,14 @@ namespace Play.Trading.Service.StateMachines
             DuringAny(
                 When(GetPurchaseState)
                 .Respond(x => x.Instance)
+            );
+        }
+        private void ConfigureFaulted()
+        {
+            During(Faulted,
+                Ignore(PurchaseRequested),
+                Ignore(GilDebited),
+                Ignore(InventoryItemGranted)
             );
         }
     }

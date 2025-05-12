@@ -97,6 +97,7 @@ namespace Play.Trading.Service
 
             var queueSettings = Configuration.GetSection(nameof(QueueSettings)).Get<QueueSettings>();
             EndpointConvention.Map<GrantedItem>(new Uri(queueSettings.GrantItemsQueueAddress));
+            EndpointConvention.Map<SubtractedItem>(new Uri(queueSettings.SubtractItemsQueueAddress));
             EndpointConvention.Map<DebitGil>(new Uri(queueSettings.DebitGilQueueAddress));
 
             services.AddMassTransitHostedService();
