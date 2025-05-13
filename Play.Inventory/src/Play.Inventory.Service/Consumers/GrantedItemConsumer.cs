@@ -35,15 +35,15 @@ namespace Play.Inventory.Service.Consumers
 
             if (currentItem == null)
             {
-                var newItem = new InventoryItem
+                currentItem = new InventoryItem
                 {
                     AcquiredDate = DateTimeOffset.Now,
                     Quantity = message.Quantity,
                     UserId = message.UserId,
                     CatalogItemId = message.CatalogItemId,
                 };
-                newItem.MesssageIds.Add(context.MessageId.Value);
-                await inventoryRepo.CreateAsync(newItem);
+                currentItem.MesssageIds.Add(context.MessageId.Value);
+                await inventoryRepo.CreateAsync(currentItem);
             }
             else
             {   
@@ -56,7 +56,7 @@ namespace Play.Inventory.Service.Consumers
             }
 
             var inventoryItemGrantedTask = context.Publish(new InventoryItemGranted(message.CorrelationId));
-            var inventoryItemUpdated = context.Publish(new InventoryItemUpdated(message.UserId, message.CatalogItemId, message.Quantity));
+            var inventoryItemUpdated = context.Publish(new InventoryItemUpdated(message.UserId, message.CatalogItemId, currentItem.Quantity));
 
             await Task.WhenAll(inventoryItemGrantedTask, inventoryItemUpdated);
         }
