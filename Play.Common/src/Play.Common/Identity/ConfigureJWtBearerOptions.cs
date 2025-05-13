@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
@@ -9,6 +10,9 @@ namespace Play.Common.Identity
 {
     public class ConfigureJWtBearerOptions : IConfigureNamedOptions<JwtBearerOptions>
     {
+        private readonly string AccessTokenParameter = "access_token";
+        private readonly string MessageHubPath = "/messageHub";
+
         private readonly IConfiguration configuration;
         public ConfigureJWtBearerOptions(IConfiguration _configuration)
         {
@@ -26,6 +30,19 @@ namespace Play.Common.Identity
                     RoleClaimType = "role"
                 };
             }
+
+            options.Events = new JwtBearerEvents{
+                OnMessageReceived = context => {
+                    var accessToken = context.Request.Query[AccessTokenParameter];
+                    var path = context.HttpContext.Request.Path;
+
+                    if(path.StartsWithSegments(MessageHubPath) && !string.IsNullOrEmpty(accessToken))
+                    {
+                        context.Token = accessToken;
+                    }
+                    return Task.CompletedTask;   
+                }
+            };
         }
 
         public void Configure(JwtBearerOptions options)
