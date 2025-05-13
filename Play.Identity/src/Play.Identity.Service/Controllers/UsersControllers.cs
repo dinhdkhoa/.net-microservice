@@ -1,9 +1,11 @@
+using MassTransit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Play.Identity.Service.Dtos;
 using Play.Identity.Service.Entities;
 using static Duende.IdentityServer.IdentityServerConstants;
+using static Play.Identity.Contracts.Contracts;
 
 namespace Play.Identity.Service.Controllers
 {
@@ -13,11 +15,14 @@ namespace Play.Identity.Service.Controllers
     public class UsersControllers : ControllerBase
     {
         private readonly UserManager<ApplicationUser> userManager;
+        private readonly IPublishEndpoint publishEndpoint;
+
         private const string AdminRole = "Admin";
 
-        public UsersControllers(UserManager<ApplicationUser> _userManager)
+        public UsersControllers(UserManager<ApplicationUser> _userManager, IPublishEndpoint publishEndpoint)
         {
             userManager = _userManager;
+            this.publishEndpoint = publishEndpoint;
         }
 
         [HttpGet]
@@ -42,6 +47,7 @@ namespace Play.Identity.Service.Controllers
             user.Email = req.Email;
             user.Gil = req.Gil;
             await userManager.UpdateAsync(user);
+            await publishEndpoint.Publish(new UserUpdated(user.Id, user.Email, user.Gil));
             return NoContent();
         }
         [HttpDelete("{id}")]
@@ -50,6 +56,7 @@ namespace Play.Identity.Service.Controllers
             var user = await userManager.FindByIdAsync(id.ToString());
             if (user == null) return NotFound();
             await userManager.DeleteAsync(user);
+            await publishEndpoint.Publish(new UserUpdated(user.Id, user.Email, 0));
             return NoContent();
         }
     }

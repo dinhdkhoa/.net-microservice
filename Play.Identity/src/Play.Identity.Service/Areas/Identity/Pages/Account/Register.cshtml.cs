@@ -10,6 +10,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
+using MassTransit;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -21,6 +22,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Play.Identity.Service.Entities;
 using Play.Identity.Service.Settings;
+using static Play.Identity.Contracts.Contracts;
 
 namespace Play.Identity.Service.Areas.Identity.Pages.Account
 {
@@ -34,13 +36,16 @@ namespace Play.Identity.Service.Areas.Identity.Pages.Account
         private readonly IEmailSender _emailSender;
         private readonly IdentitySettings _settings;
 
+        private readonly IPublishEndpoint _publishEndpoint;
+
         public RegisterModel(
             UserManager<ApplicationUser> userManager,
             IUserStore<ApplicationUser> userStore,
             SignInManager<ApplicationUser> signInManager,
             ILogger<RegisterModel> logger,
             IEmailSender emailSender,
-            IOptions<IdentitySettings> optionsSettings)
+            IOptions<IdentitySettings> optionsSettings,
+            IPublishEndpoint publishEndpoint)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -49,6 +54,7 @@ namespace Play.Identity.Service.Areas.Identity.Pages.Account
             _logger = logger;
             _emailSender = emailSender;
             _settings = optionsSettings.Value;
+            _publishEndpoint = publishEndpoint;
         }
 
         /// <summary>
@@ -131,6 +137,7 @@ namespace Play.Identity.Service.Areas.Identity.Pages.Account
                     _logger.LogInformation("User created a new account with password.");
                     await _userManager.AddToRoleAsync(user, Roles.Player);
                     _logger.LogInformation($"User created with the role: {Roles.Player}");
+                    await _publishEndpoint.Publish(new UserUpdated(user.Id, user.Email, user.Gil));
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);

@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using MassTransit;
+using Microsoft.VisualBasic;
 using Play.Common;
 using Play.Inventory.Service.Entities;
 using Play.Inventory.Service.Exceptions;
@@ -39,6 +40,7 @@ namespace Play.Inventory.Service.Consumers
                 currentItem.Quantity -= message.Quantity;
                 currentItem.MesssageIds.Add(context.MessageId.Value);
                 await inventoryRepo.UpdateAsync(currentItem);
+                await context.Publish(new InventoryItemUpdated(message.UserId, message.CatalogItemId, message.Quantity));
 
                 if (currentItem.Quantity <= 0)
                 {

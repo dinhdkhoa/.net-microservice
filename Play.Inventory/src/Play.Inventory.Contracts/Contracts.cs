@@ -8,8 +8,8 @@ namespace Play.Inventory.Contracts
     {
         public record GrantedItem(Guid UserId, Guid CatalogItemId, int Quantity, Guid CorrelationId);
         public record InventoryItemGranted( Guid CorrelationId);
-
         public record SubtractedItem(Guid UserId, Guid CatalogItemId, int Quantity, Guid CorrelationId);
         public record InventoryItemSubtracted(Guid CorrelationId);
+        public record InventoryItemUpdated(Guid UserId, Guid CatalogItemId, int NewTotalQuantity);
     }
 }

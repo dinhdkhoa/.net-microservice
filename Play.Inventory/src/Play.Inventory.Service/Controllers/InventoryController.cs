@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,6 +13,7 @@ using Play.Common;
 using Play.Inventory.Service.Clients;
 using Play.Inventory.Service.Dtos;
 using Play.Inventory.Service.Entities;
+using static Play.Inventory.Contracts.Contracts;
 
 namespace Play.Inventory.Service.Controllers
 {
@@ -23,12 +25,15 @@ namespace Play.Inventory.Service.Controllers
         private const string AdminRole = "Admin";
 
         private readonly IRepository<CatalogItem> catalogItemRepo;
+        private readonly IPublishEndpoint publishEndpoint;
+
         // private readonly CatalogClient catalogClient;
-        
-        public InventoryController(IRepository<InventoryItem> _repo, IRepository<CatalogItem> _catalogItemRepo)
+
+        public InventoryController(IRepository<InventoryItem> _repo, IRepository<CatalogItem> _catalogItemRepo, IPublishEndpoint publishEndpoint)
         {
             repo = _repo;
             catalogItemRepo = _catalogItemRepo;
+            this.publishEndpoint = publishEndpoint;
             // catalogClient = _catalogClient;
         }
 
@@ -87,6 +92,8 @@ namespace Play.Inventory.Service.Controllers
                 currentItem.Quantity += req.Quantity;
                 await repo.UpdateAsync(currentItem);
             }
+
+            await publishEndpoint.Publish(new InventoryItemUpdated(currentUserId, currentItem.CatalogItemId, currentItem.Quantity));
 
             return Ok();
         }

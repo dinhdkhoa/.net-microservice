@@ -55,7 +55,10 @@ namespace Play.Inventory.Service.Consumers
                 await inventoryRepo.UpdateAsync(currentItem);
             }
 
-            await context.Publish(new InventoryItemGranted(message.CorrelationId));
+            var inventoryItemGrantedTask = context.Publish(new InventoryItemGranted(message.CorrelationId));
+            var inventoryItemUpdated = context.Publish(new InventoryItemUpdated(message.UserId, message.CatalogItemId, message.Quantity));
+
+            await Task.WhenAll(inventoryItemGrantedTask, inventoryItemUpdated);
         }
     }
 }
