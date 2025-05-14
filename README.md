@@ -54,3 +54,13 @@ dotnet nuget add source \
   --name github \
   "https://nuget.pkg.github.com/$owner/index.json"
 ```
+Build docker image with secrets
+```bash
+
+version="1.0.0"
+export GH_OWNER="net-microservices" # must correspond to the ids used in the Dockerfile
+export GH_PAT="[PAT HERE]"
+
+docker build --secret id=GH_OWNER --secret id=GH_PAT -t play.identity:$version .
+
+```
