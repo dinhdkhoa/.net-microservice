@@ -11,6 +11,7 @@ using Play.Common.RabbitMQ;
 using MassTransit;
 using Play.Identity.Service.Exceptions;
 using GreenPipes;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,6 +40,7 @@ builder.Services.AddIdentityServer(options => {
     options.Events.RaiseSuccessEvents = true;
     options.Events.RaiseFailureEvents = true;
     options.Events.RaiseErrorEvents = true;
+    options.KeyManagement.KeyPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 })
 .AddAspNetIdentity<ApplicationUser>() //Connect IdentityServer To AspNetIdentity
 .AddInMemoryApiScopes(identityServerSettings.ApiScopes)
@@ -76,6 +78,10 @@ app.UseStaticFiles();
 app.UseAuthentication();
 app.UseIdentityServer();
 app.UseAuthorization();
+
+app.UseCookiePolicy(new CookiePolicyOptions{
+    MinimumSameSitePolicy = SameSiteMode.Lax
+});
 
 app.MapControllers();
 app.MapRazorPages();
