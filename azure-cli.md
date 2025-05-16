@@ -8,3 +8,7 @@ Create Cosmos DB Account
 ```bash 
 az cosmosdb create --name $appname --resource-group $appname --kind MongoDB --enable-free-tier
 ```
+Create Service bus
+```bash 
+az servicebus namespace create --name $appname --resource-group $appname --sku Standard
+```
