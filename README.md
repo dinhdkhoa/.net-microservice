@@ -94,7 +94,7 @@ play.identity:1.0.x
 
 Push Docker Image To ACR
 ```bash
-appname="playeconomy"
+appname="play.economy"
 acrname="playeconomycrname"
 
 az acr login --name $acrname

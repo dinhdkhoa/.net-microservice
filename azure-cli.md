@@ -28,12 +28,16 @@ Creates an Azure Kubernetes Service (AKS) cluster with:
 - SSH keys generated for node access
 
 ```bash 
-az aks create -n $appname -g $appname \
+aksname="playeconomyaks"
+az aks create -n $aksname -g $appname \
   --node-vm-size Standard_B2s \
   --node-count 2 \
-  --attach-acr $appname \
+  --attach-acr $acrname \
   --enable-oidc-issuer \
   --enable-workload-identity \
   --generate-ssh-keys
-
+```
+Add AKS to kube config:
+```bash 
+az aks get-credentials --name $aksname --resource-group $appname
 ```
