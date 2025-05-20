@@ -38,3 +38,14 @@ spec:
             cpu: "150m"
         ports:
         - containerPort: 5211
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: identity-service
+spec:
+  selector:
+    app: identity
+  ports:
+  - port: 80
+    targetPort: 5211

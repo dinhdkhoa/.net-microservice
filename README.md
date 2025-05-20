@@ -121,3 +121,19 @@ Check Kubernetes secrets
 ```bash
 kubectl get secrets -n $namespace
 ```
+Apply the Kubernetes deployment manifest to create resources in the given namespace
+```bash
+kubectl apply -f ./kubernetes/identity.yml -n $namespace
+```
+List all pods in the namespace to verify deployment
+```bash
+kubectl get pods -n $namespace
+```
+View logs of a specific pod (replace <pod-name> with the actual pod name)
+```bash
+kubectl logs <pod-name> -n $namespace
+```
+Describe pod details: status, events, IP, container conditions, etc.
+```bash
+kubectl describe pod <pod-name> -n $namespace
+```
