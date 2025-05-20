@@ -105,3 +105,19 @@ docker tag play.identity:$version "$acrname.azurecr.io/play.identity:$version"
 docker push "$acrname.azurecr.io/play.identity:$version"
 
 ```
+Create the Kubernetes namespace
+```bash
+namespace="identity"
+kubectl create namespace $namespace
+```
+Create the Kubernetes secrets
+```bash
+kubectl create secret generic identity-secrets \
+  --from-literal="mongo-connectionstring=$mongoDbConnectionString" \
+  --from-literal="servicebus-connectionstring=$serviceBusConnectionString" \
+  --from-literal="admin-password=$adminpass" -n $namespace
+```
+Check Kubernetes secrets
+```bash
+kubectl get secrets -n $namespace
+```
