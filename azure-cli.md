@@ -41,3 +41,7 @@ Add AKS to kube config:
 ```bash 
 az aks get-credentials --name $aksname --resource-group $appname
 ```
+Create az keyvault:
+```bash 
+ az keyvault create -n playeconomyzkv -g $appname
+```
