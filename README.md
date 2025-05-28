@@ -121,6 +121,10 @@ Check Kubernetes secrets
 ```bash
 kubectl get secrets -n $namespace
 ```
+Delete Kubernetes secrets
+```bash
+kubectl delete secrets <secret's-name> -n $namespace
+```
 Apply the Kubernetes deployment manifest to create resources in the given namespace
 ```bash
 kubectl apply -f ./kubernetes/identity.yml -n $namespace
@@ -128,6 +132,10 @@ kubectl apply -f ./kubernetes/identity.yml -n $namespace
 List all pods in the namespace to verify deployment
 ```bash
 kubectl get pods -n $namespace
+```
+List all services  in the namespace
+```bash
+kubectl get services -n $namespace
 ```
 View logs of a specific pod (replace <pod-name> with the actual pod name)
 ```bash

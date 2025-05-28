@@ -41,3 +41,33 @@ Add AKS to kube config:
 ```bash 
 az aks get-credentials --name $aksname --resource-group $appname
 ```
+Create az keyvault:
+```bash 
+$akzname=akz
+ az keyvault create -n $akzname -g $appname
+```
+Creating the Azure Managed Identity and granting it access to Key Vault secrets
+```bash 
+#Create the managed identity
+az identity create --resource-group $appname --name $namespace
+
+#Get the client ID of the managed identity
+IDENTITY_CLIENT_ID=$(az identity show -g $appname -n $namespace --query clientId -o tsv)
+
+#Set Key Vault policy to allow get and list secret permissions
+az keyvault set-policy -n $appname --secret-permissions get list --spn $IDENTITY_CLIENT_ID
+```
+Create the federated identity credential
+
+```bash 
+$aks_oidc_issuer=$( az aks show --name $akzname --resource-group $appname --query "oidcIssuerProfile.issuerUrl" -o tsv)
+
+az identity federated-credential create \
+  --name $namespace \
+  --identity-name $namespace \
+  --resource-group $appname \
+  --issuer $AKS_OIDC_ISSUER \
+  --subject "system:serviceaccount:${namespace}:${namespace}-serviceaccount"
+
+```
+
