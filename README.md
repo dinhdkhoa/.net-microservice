@@ -145,3 +145,36 @@ Describe pod details: status, events, IP, container conditions, etc.
 ```bash
 kubectl describe pod <pod-name> -n $namespace
 ```
+
+Thêm Helm repo
+```bash
+helm repo add datawire https://app.getambassador.io
+helm repo update
+
+#Cài CRDs cho Emissary
+kubectl apply -f https://app.getambassador.io/yaml/emissary/3.3.0/emissary-crds.yaml
+
+#Đợi CRDs sẵn sàng
+kubectl wait --timeout=90s --for=condition=available deployment emissary-apiext -n emissary-system
+
+#Khai báo biến
+namespace="emissary"
+appname="your-dns-label" # <-- đổi tên phù hợp với Azure DNS label của bạn
+
+#Cài emissary-ingress với DNS annotation
+helm install emissary-ingress datawire/emissary-ingress \
+  --set service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"=$appname \
+  -n $namespace --create-namespace
+
+#Đợi ingress triển khai xong
+kubectl rollout status deployment/emissary-ingress -n $namespace -w
+
+#List helm releases
+helm list -n emissary
+```
+
+Configuring Emissary-ingress routing
+```bash
+kubectl apply -f .\emissary-ingress\listener.yaml -n $namespace
+kubectl apply -f .\emissary-ingress\mappings.yaml -n $namespace
+```
