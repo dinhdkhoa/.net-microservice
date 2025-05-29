@@ -178,3 +178,12 @@ Configuring Emissary-ingress routing
 kubectl apply -f .\emissary-ingress\listener.yaml -n $namespace
 kubectl apply -f .\emissary-ingress\mappings.yaml -n $namespace
 ```
+Installing cert-manager
+```bash
+namespace="cert-manager"
+
+helm repo add jetstack https://charts.jetstack.io
+helm repo update
+
+helm install cert-manager jetstack/cert-manager --namespace emissary --version v1.17.2 --set crds.enabled=true 
+```
