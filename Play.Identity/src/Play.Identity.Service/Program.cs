@@ -12,6 +12,8 @@ using MassTransit;
 using Play.Identity.Service.Exceptions;
 using GreenPipes;
 using System.Reflection;
+using Play.Common.HealthChecks;
+using Play.Identity.Service.HealthChecks;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,7 +32,7 @@ builder.Services
     }).AddDefaultTokenProviders()
     .AddDefaultUI();
 
-builder.Services.AddRabbitMQ(retryConfig => {
+builder.Services.AddMessageBroker(builder.Configuration, retryConfig => {
     retryConfig.Interval(3, TimeSpan.FromSeconds(5));
     retryConfig.Ignore(typeof(InsufficientFundsException));
     retryConfig.Ignore(typeof(UnknownUserException));
@@ -57,6 +59,7 @@ builder.Services.AddHostedService<IdentitySeedHostedService>();
 builder.Services.AddRazorPages();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddHealthChecks().AddMongoDbHealthCheck();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
@@ -85,5 +88,7 @@ app.UseCookiePolicy(new CookiePolicyOptions{
 
 app.MapControllers();
 app.MapRazorPages();
+
+app.MapPlayEconomyHealthChecks();
 
 app.Run();
