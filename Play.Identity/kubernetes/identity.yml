@@ -13,25 +13,11 @@ spec:
     spec:
       containers:
       - name: identity
-        image: playeconomyregistry.azurecr.io/play.identity:1.0.0
+        image: registry.azurecr.io/play.identity:1.0.0
         env:
           - name: ServiceSettings__MessageBroker
             value: SERVICE_BUS
-          - name: ServiceBusSettings__ConnectionString
-            valueFrom:
-              secretKeyRef:
-                name: identity-secrets
-                key: servicebus-connectionstring
-          - name: MongoDbSettings__ConnectionString
-            valueFrom:
-              secretKeyRef:
-                name: identity-secrets
-                key: mongo-connectionstring
-          - name: IdentitySettings__AdminUserPassword
-            valueFrom:
-              secretKeyRef:
-                name: identity-secrets
-                key: admin-password
+
         resources:
           limits:
             memory: "128Mi"
@@ -49,3 +35,12 @@ spec:
   ports:
   - port: 80
     targetPort: 5211
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: identity-serviceaccount #match federated credentials of the labels in managed identity (identity)
+  annotations:
+    azure.workload.identity/client-id: #id of managed identity in azure key vault IAM
+  labels:
+    azure.workload.identity/use: "true"

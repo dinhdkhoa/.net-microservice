@@ -4,7 +4,7 @@ EXPOSE 5211
 
 ENV ASPNETCORE_URLS=http://+:5211
 
-USER app
+USER root
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 COPY ["src/Play.Identity.Contracts/Play.Identity.Contracts.csproj", "src/Play.Identity.Contracts/"]
 COPY ["src/Play.Identity.Service/Play.Identity.Service.csproj", "src/Play.Identity.Service/"]
@@ -27,3 +27,6 @@ FROM base AS final
 WORKDIR /app
 COPY --from=build /app/publish .
 ENTRYPOINT ["dotnet", "Play.Identity.Service.dll"]
+
+
+
