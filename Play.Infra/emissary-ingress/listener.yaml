@@ -1,0 +1,27 @@
+---
+apiVersion: getambassador.io/v3alpha1
+kind: Listener
+metadata:
+  name: http-listener
+spec:
+  port: 8080                     # int32, port number on which to listen
+  protocol: HTTP                # HTTP, HTTPS, HTTPPROXY, HTTPSPROXY, TCP
+  securityModel: XFP             # XFP (for X-Forwarded-Proto), SECURE, INSECURE
+  # statsPrefix: example-listener  # default depends on protocol; see below
+  # l7Depth: 0                     # int32
+  hostBinding:
+    namespace:
+      from: SELF                 # SELF, ALL
+    # selector: ...                # Kubernetes label selector
+---
+apiVersion: getambassador.io/v3alpha1
+kind: Listener
+metadata:
+  name: https-listener
+spec:   
+  port: 8443
+  protocol: HTTPS
+  securityModel: XFP
+  hostBinding:  
+    namespace:
+      from: SELF

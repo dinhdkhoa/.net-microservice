@@ -1,0 +1,36 @@
+---
+apiVersion: getambassador.io/v3alpha1
+kind:  Mapping
+metadata:
+  name:  identity-mapping
+spec:
+  hostname: playeconomy.cloudapp.azure.com
+  prefix: /identity/
+  service: identity-service.identity
+---
+apiVersion: getambassador.io/v3alpha1
+kind:  Mapping
+metadata:
+  name:  catalog-mapping
+spec:
+  hostname: playeconomy.cloudapp.azure.com
+  prefix: /catalog/
+  service: catalog-service.catalog
+---
+apiVersion: getambassador.io/v3alpha1
+kind:  Mapping
+metadata:
+  name:  trading-mapping
+spec:
+  hostname: playeconomy.cloudapp.azure.com
+  prefix: /trading/
+  service: trading-service.trading
+---
+apiVersion: getambassador.io/v3alpha1
+kind:  Mapping
+metadata:
+  name:  inventory-mapping
+spec:
+  hostname: playeconomy.cloudapp.azure.com
+  prefix: /inventory/
+  service: inventory-service.inventory
