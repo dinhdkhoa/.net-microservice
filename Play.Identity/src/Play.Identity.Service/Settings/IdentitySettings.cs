@@ -11,5 +11,8 @@ namespace Play.Identity.Service.Settings
         public string AdminUserPassword { get; init; }
 
         public decimal StartingGil { get; init; }
+        public string PathBase { get; init; }
+        public string CertificateCrtFilePath { get; init; }
+        public string CertificateKeyFilePath { get; init; }
     }
 }
