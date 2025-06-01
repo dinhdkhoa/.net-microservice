@@ -18,7 +18,12 @@ az provider register --namespace Microsoft.ContainerRegistry
 ```
 Create Container Registry
 ```bash 
-az acr create --name $appname --resource-group $appname --sku Basic
+acrname="acrname"
+az acr create --name $acrname --resource-group $appname --sku Basic
+```
+Login Container Registry
+```bash 
+ az acr login -n $acrname
 ```
 Creates an Azure Kubernetes Service (AKS) cluster with:
 

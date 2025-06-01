@@ -64,7 +64,7 @@ export GH_PAT="[PAT HERE]"
 docker build --secret id=GH_OWNER --secret id=GH_PAT -t play.identity:$version .
 #build with acr tag
 acrname="playeconomycrname"
-docker build --secret id=GH_OWNER --secret id=GH_PAT -t "$acrname.azurecr.io/play.identity:$version" .
+docker build --secret id=GH_OWNER --secret id=GH_PAT -t "$acrname.azurecr.io/play.$namespace:$version" .
 
 ```
 
@@ -100,9 +100,9 @@ acrname="playeconomycrname"
 az acr login --name $acrname
 
 # tag if needed
-docker tag play.identity:$version "$acrname.azurecr.io/play.identity:$version"
+docker tag play.$namespace:$version "$acrname.azurecr.io/play.identity:$version"
 
-docker push "$acrname.azurecr.io/play.identity:$version"
+docker push "${acrname}.azurecr.io/play.${namespace}:${version}"
 
 ```
 Create the Kubernetes namespace
@@ -175,8 +175,10 @@ helm list -n emissary
 
 Configuring Emissary-ingress routing
 ```bash
-kubectl apply -f .\emissary-ingress\listener.yaml -n $namespace
-kubectl apply -f .\emissary-ingress\mappings.yaml -n $namespace
+namespace="emissary" 
+
+kubectl apply -f ./emissary-ingress/listener.yaml -n $namespace
+kubectl apply -f ./emissary-ingress/mappings.yaml -n $namespace
 ```
 Installing cert-manager
 ```bash
@@ -202,4 +204,8 @@ namespace="emissary"
 kubectl apply -f ./emissary-ingress/tls-certificate.yaml -n $namespace
 
 kubectl get certificate -n $namespace
+```
+ Enabling TLS and HTTPS
+```bash
+kubectl apply -f ./emissary-ingress/host.yaml -n $namespace
 ```
