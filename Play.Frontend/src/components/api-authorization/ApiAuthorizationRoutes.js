@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { Route } from "react-router-dom"
+import { Route } from 'react-router';
 import { Login } from './Login'
 import { Logout } from './Logout'
 import { AuthorizationPaths, LoginActions, LogoutActions } from './ApiAuthorizationConstants';

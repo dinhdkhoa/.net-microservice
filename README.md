@@ -205,7 +205,18 @@ kubectl apply -f ./emissary-ingress/tls-certificate.yaml -n $namespace
 
 kubectl get certificate -n $namespace
 ```
- Enabling TLS and HTTPS
+Enabling TLS and HTTPS
 ```bash
 kubectl apply -f ./emissary-ingress/host.yaml -n $namespace
+```
+Deploy FE to aks using Helm
+```bash
+namespace="frontend"
+helm install frontend-client ./helm --create-namespace -n $namespace
+
+```
+Apply FE Helm Chart
+```bash
+namespace="frontend"
+helm upgrade frontend-client ./helm -n $namespace
 ```
