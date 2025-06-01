@@ -1,0 +1,54 @@
+microserviceName: "identity"
+
+image:
+  repository:  registry.azurecr.io/play.identity
+  tag: 1.0.3
+
+env:
+  ServiceSettings__MessageBroker: SERVICE_BUS
+  ServiceSettings__KeyVaultName: kv
+  IdentitySettings__PathBase: /identity
+  IdentitySettings__CertificateCrtFilePath: /certificates/certificate.crt
+  IdentitySettings__CertificateKeyFilePath: /certificates/certificate.key
+  IdentityServerSettings__Clients__1__RedirectUris__1: https://playeconomy.cloudapp.azure.com/authentication/login-callback
+  IdentityServerSettings__Clients__1__PostLogoutRedirectUris__1: https://playeconomy.cloudapp.azure.com/authentication/logout-callback
+
+resources:
+  requests:
+    memory: "128Mi"
+    cpu: "150m"
+  limits:
+    memory: "128Mi"
+    cpu: "150m"
+
+container: 
+  port: 5211
+  liveness:
+    path: /health/live
+    initialDelaySeconds: 10
+  readiness:
+    path: /health/ready
+    initialDelaySeconds: 10
+  volumeMounts: 
+    - name: certificate-volume
+      mountPath: /certificates
+
+volumes:
+  - name: certificate-volume
+    secret: 
+      secretName: signing-cert
+      items: 
+        - key: tls.key
+          path: certificate.key
+        - key: tls.crt
+          path: certificate.crt
+
+service:
+  port: 80
+  type: ClusterIP
+
+certificate: 
+  secretName: signing-cert
+  dnsNames: "playeconomy.cloudapp.azure.com"
+
+identityClientId: 98701bf7-d1cc-44b5-8c62-90c9f6d3cfcb

@@ -220,3 +220,18 @@ Apply FE Helm Chart
 namespace="frontend"
 helm upgrade frontend-client ./helm -n $namespace
 ```
+Delete All Namespaced Resources (pods, services, deployments ,replicasets)
+```bash
+namespace="namespace"
+kubectl delete all --all -n  $namespace
+
+#To Check : 
+kubectl get all -n identity
+No resources found in identity namespace.
+```
+Install Helm Chart Identity Service
+```bash
+namespace="identity"
+helm install identity-service ./helm -f ./helm/values.yaml -n $namespace
+helm upgrade identity-service ./helm -f ./helm/values.yaml -n $namespace
+```
